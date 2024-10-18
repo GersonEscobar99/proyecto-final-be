@@ -72,6 +72,8 @@ public class DwApplication {
             usuarioRepositorio.save(usuario1);
             usuarioRepositorio.save(usuario2);
             usuarioRepositorio.save(usuario3);
+
+            //bienvenidos
         };
     }
 }
