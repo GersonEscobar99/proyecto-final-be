@@ -23,16 +23,42 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Long idUsuario;
+
+    @Column(name = "username", nullable = false, unique = true, length = 20)
     private String username;
+
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+
+    @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
+
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
+
+    @Column(name = "telefono", length = 20)
     private String telefono;
+
     private boolean enabled = true;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = Rol.class)
-    @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "rol_id", referencedColumnName = "id_rol"))
-    private List<Rol> roles = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "id_departamento", nullable = false)
+    private Departamento departamento;
+
+    @ManyToOne
+    @JoinColumn(name = "id_horario", nullable = false)
+    private Horario horario;
+
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "UsuarioRol",
+            joinColumns = @JoinColumn(name = "id_usuario"),
+            inverseJoinColumns = @JoinColumn(name = "id_rol")
+    )
+    private Set<Rol> roles = new HashSet<>();
 
 }
