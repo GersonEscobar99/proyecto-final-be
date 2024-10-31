@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import proyecto_final.dw.repositorios.UsuarioRepositorio;
+import proyecto_final.dw.repositorios.UsuarioRepository;
 import proyecto_final.dw.security.filters.JwtAuthenticationFilter;
 import proyecto_final.dw.security.filters.JwtAuthorizationFilter;
 import proyecto_final.dw.security.jwt.JwtUtils;
@@ -29,7 +29,7 @@ public class SecurityConfig {
     JwtUtils jwtUtils;
 
     @Autowired
-    UsuarioRepositorio usuarioRepositorio;
+    UsuarioRepository usuarioRepository;
 
     @Autowired
     UserDetailsService userDetailsService;
@@ -41,7 +41,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager)
             throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils, usuarioRepositorio);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils, usuarioRepository);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
         jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 
@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.and())
                 .csrf(config -> config.disable())
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/usuarios").permitAll();
                     auth.requestMatchers("/login").permitAll();
                     auth.anyRequest().authenticated();
                 })
@@ -60,17 +61,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    // Datos Testeo Ingreso Rutas Protegidas
-    // @Bean
-    // UserDetailsService userDetailsService() {
-    // InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-    // manager.createUser(User.withUsername("joab")
-    // .password("1234")
-    // .roles()
-    // .build());
-
-    // return manager;
-    // }
 
     @Bean
     PasswordEncoder passwordEncoder() {

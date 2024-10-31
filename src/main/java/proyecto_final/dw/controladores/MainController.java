@@ -2,43 +2,38 @@ package proyecto_final.dw.controladores;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import proyecto_final.dw.controladores.request.CrearUsuarioDTO;
-import proyecto_final.dw.modelos.ERole;
 import proyecto_final.dw.modelos.Rol;
 import proyecto_final.dw.modelos.Usuario;
-import proyecto_final.dw.repositorios.RolRepositorio;
-import proyecto_final.dw.repositorios.UsuarioRepositorio;
-import proyecto_final.dw.servicios.UsuarioServicio;
+import proyecto_final.dw.repositorios.RolRepository;
+import proyecto_final.dw.repositorios.UsuarioRepository;
+import proyecto_final.dw.servicios.UsuarioService;
 
 @RestController
+
 public class MainController {
 
     @Autowired
-    private UsuarioRepositorio usuarioRepositorio;
+    private UsuarioRepository usuarioRepositorio;
 
     @Autowired
-    private RolRepositorio rolRepositorio;
+    private RolRepository rolRepositorio;
+
 
     @Autowired
-    UsuarioServicio usuarioServicio;
+    UsuarioService usuarioService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @GetMapping("/hello")
     public String hello() {
@@ -61,10 +56,12 @@ public class MainController {
                         .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + roleName)))
                 .collect(Collectors.toList());
 
+                String hashedPassword = passwordEncoder.encode(crearUsuarioDTO.getPassword());
+
         // Crea el usuario
         Usuario usuario = Usuario.builder()
                 .username(crearUsuarioDTO.getUsername())
-                .password(crearUsuarioDTO.getPassword())
+                .password(hashedPassword)
                 .nombre(crearUsuarioDTO.getNombre())
                 .apellido(crearUsuarioDTO.getApellido())
                 .email(crearUsuarioDTO.getEmail())
@@ -77,29 +74,6 @@ public class MainController {
 
         return ResponseEntity.ok(usuario);
     }
-
-
-    @PostMapping("/create/user")
-    public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario,
-                                                @RequestParam Long idDepartamento,
-                                                @RequestParam Long idHorario,
-                                                @RequestParam Set<Long> idsRoles) {
-        try {
-            Usuario nuevoUsuario = usuarioServicio.crearUsuario(usuario, idDepartamento, idHorario, idsRoles);
-            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-    @DeleteMapping("/deleteUser")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String deleteUser(@RequestParam String id) {
-        usuarioRepositorio.deleteById(Long.parseLong(id));
-        return "Usuario eliminado";
-    }
-
 
 
 }

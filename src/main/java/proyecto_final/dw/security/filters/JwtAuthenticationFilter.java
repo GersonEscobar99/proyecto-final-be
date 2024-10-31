@@ -20,17 +20,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import proyecto_final.dw.modelos.Usuario;
-import proyecto_final.dw.repositorios.UsuarioRepositorio;
+import proyecto_final.dw.repositorios.UsuarioRepository;
 import proyecto_final.dw.security.jwt.JwtUtils;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private JwtUtils jwtUtils;
-    private UsuarioRepositorio usuarioRepositorio;
+    private UsuarioRepository usuarioRepository;
 
-    public JwtAuthenticationFilter(JwtUtils jwtUtils, UsuarioRepositorio usuarioRepositorio) {
+    public JwtAuthenticationFilter(JwtUtils jwtUtils, UsuarioRepository usuarioRepository) {
         this.jwtUtils = jwtUtils;
-        this.usuarioRepositorio = usuarioRepositorio;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         User user = (User) authResult.getPrincipal();
 
         // Buscar el usuario en la base de datos
-        Usuario usuario = usuarioRepositorio.findByUsername(user.getUsername())
+        Usuario usuario = usuarioRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
         // Generar el token JWT

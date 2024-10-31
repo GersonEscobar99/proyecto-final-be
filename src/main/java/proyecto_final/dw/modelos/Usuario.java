@@ -1,23 +1,20 @@
 package proyecto_final.dw.modelos;
 
 import jakarta.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "usuario")
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,12 +50,17 @@ public class Usuario {
     private Horario horario;
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "UsuarioRol",
             joinColumns = @JoinColumn(name = "id_usuario"),
             inverseJoinColumns = @JoinColumn(name = "id_rol")
     )
+    @Builder.Default
     private Set<Rol> roles = new HashSet<>();
 
+
+    public boolean isBefore(LocalTime minusMinutes) {
+        throw new UnsupportedOperationException("Unimplemented method 'isBefore'");
+    }
 }
